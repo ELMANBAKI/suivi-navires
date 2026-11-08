@@ -2310,7 +2310,15 @@ async function loadProfile(){
   else if(!data||!data.actif){ me=null; meState='denied'; }
   else { me=data; meState='ok'; }
 }
-function start(){ if(!session){ me=null; meState='load'; render(); return; } loadProfile().then(()=>{ if(me) loadSnaps(); else render(); if(me&&me.doit_changer_mdp&&!me.legacy) forcePwd(); }); }
+function start(){ 
+    // تجاوز تسجيل الدخول للعرض التجريبي
+    session = { user: { id: 'demo-user', email: 'fellah@demo.local' } };
+    me = { role: 'responsable', terminaux: ['TCE', 'TC3'], email: 'fellah@demo.local', legacy: true };
+    meState = 'ok';
+    
+    render();
+    loadSnaps();
+}
 sb.auth.getSession().then(({data})=>{ session=data.session; start(); });
 sb.auth.onAuthStateChange((ev,s)=>{ if(ev==='USER_UPDATED'){ session=s; return; } if(!s) closeModal(); session=s; lastSig=''; start(); });
 setInterval(()=>{ if(session){ loadSnaps().then(()=>flowBannerPut()); } },60000);
